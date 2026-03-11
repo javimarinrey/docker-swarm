@@ -13,8 +13,9 @@ Este comando convierte el nodo actual en un manager y genera un token que permit
 | :-------- | :------- | 
 | Ver token de unión | `docker swarm join-token worker` o (`manager`) para recuperar el código necesario para nuevos nodos|
 | Unirse al clúster | `docker swarm join --token <TOKEN> <IP_MANAGER>:<PUERTO>` según el token se añade un worker o un manager |
-| Promover un worker a manager | `docker swarm leave`|
-| Abandonar el clúster | `docker node promote <HOSTNAME_WORKER>` |
+| Promover un worker a manager | `docker node promote <HOSTNAME_WORKER>`|
+| Demote un manager a worker | `docker node demote <HOSTANAME_MANAGER>` |
+| Abandonar el clúster | `docker swarm leave` |
 
 Para que un cluster de Docker Swarm funcione correctamente entre nodos manager y worker, debes abrir 3 puertos principales entre todos los nodos del cluster.
 
@@ -62,6 +63,7 @@ ping IP_OTRO_CONTENEDOR
 | Crear un servicio | `docker service create --name <NOMBRE> <IMAGEN>` |
 | Listar servicios | `docker service ls` |
 | Escalar un servicio | `docker service scale <NOMBRE>=<NUM_REPLICAS>` |
+| Actualizar imagen de un servicio en producción (rolling update) | `docker service update --image <IMAGE> <SERVICE>` |
 | Eliminar un servicio | `docker service rm <NOMBRE>` |
 
 ## Despliegue con Stack (Similar a Compose)
@@ -127,9 +129,17 @@ Si ya tienes el disco lleno, puedes vaciar el archivo de log actual de un conten
 truncate -s 0 $(docker inspect --format='{{.LogPath}}' <ID_CONTENEDOR>)
 ```
 
-## Configuración de una red Overlay
+## Redes y overlay
 
 La red **overlay** es fundamental en Docker Swarm porque crea una red virtual distribuida que permite que los contenedores en diferentes nodos se comuniquen de forma segura, como si estuvieran en la misma máquina.
+
+| Descripción | Comando     | 
+| :-------- | :------- | 
+| Lista redes, incluyendo overlay | `docker network ls` |
+| Ver nodos y contenedores conectados a una red overlay | `docker network inspect <NETWORK>` |
+| Crear una red overlay para servicios entre nodos | `docker network create --driver overlay <NAME>` |
+| Conectar un contenedor individual a una overlay network | `docker network connect <NETWORK> <CONTAINER>` |
+
 
 **1. Crear la red overlay**
 
