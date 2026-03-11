@@ -40,6 +40,61 @@ Este comando convierte el nodo actual en un manager y genera un token que permit
 | Desplegar una aplicación | `docker stack deploy -c docker-compose.yml <NOMBRE_STACK>` |
 | Listar stacks | `docker stack ls` |
 | Eliminar un stack | `docker stack rm <NOMBRE_STACK>` |
+| Ver estado de los servicios | `docker stack services <NOMBRE_STACK>` |
+| Ver en qué nodos están los contenedores | `docker stack ps <NOMBRE_STACK>` |
+
+## Monitorización con logs
+| Descripción | Comando     | 
+| :-------- | :------- | 
+| Ver logs de un servicio específico | `docker service logs <NOMBRE_SERVICIO_O_ID>` |
+| Ver solo las últimas líneas | `docker service logs --tail 50 <NOMBRE_SERVICIO_O_ID>` |
+| Ver logs con marcas de tiempo (Timestamps) | `docker service logs -t <NOMBRE_SERVICIO_O_ID>` |
+| Filtrar por una réplica específica | Primero obtienes los IDs de las tareas: `docker service ps <NOMBRE_SERVICIO>`. Luego consultas el log de esa tarea: `docker service logs <ID_TAREA>` |
+| Logs de Stack | `docker service logs <NOMBRE_STACK>` |
+
+Para evitar que los logs consuman todo el espacio en disco, debes configurar el
+Logging Driver (generalmente json-file). Tienes dos formas de hacerlo: para todo el clúster o específicamente en un servicio/stack.
+
+**1. Configuración en un Stack**
+
+Es la mejor opción porque queda documentado en tu infraestructura. Añade la sección logging a cada servicio:
+
+```
+services:
+  api:
+    image: mi-backend:latest
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"   # Tamaño máximo de cada archivo
+        max-file: "3"     # Número de archivos de rotación antes de borrar el viejo
+    deploy:
+      replicas: 3
+```
+
+**2. Configuración global (En cada Nodo)**
+
+Si quieres que todos los contenedores del nodo (incluso los que no son de Swarm) sigan esta regla, debes editar o crear el archivo /etc/docker/daemon.json:
+
+```
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
+```
+
+Reinicia Docker: `sudo systemctl restart docker`
+
+**3. Limpiar logs manualmente (Emergencia)**
+
+Si ya tienes el disco lleno, puedes vaciar el archivo de log actual de un contenedor específico sin borrar el contenedor:
+```
+# Ejecutar en el nodo donde vive el contenedor
+truncate -s 0 $(docker inspect --format='{{.LogPath}}' <ID_CONTENEDOR>)
+```
 
 ## Configuración de una red Overlay
 
