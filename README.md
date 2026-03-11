@@ -32,6 +32,13 @@ nc -zvu <IP_MANAGER> 7946
 nc -zvu <IP_MANAGER> 4789
 ```
 
+Testear desde estos script:
+
+```
+sh check-swarm-ports.sh <IP_NODO>
+sh check-swarm-ports.sh <IP_NODO>
+```
+
 Probar comunicación:
 
 ```
