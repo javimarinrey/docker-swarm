@@ -12,9 +12,34 @@ Este comando convierte el nodo actual en un manager y genera un token que permit
 
 | Descripción | Comando     | 
 | :-------- | :------- | 
-| Unirse al clúster | `docker swarm join --token <TOKEN> <IP_MANAGER>:<PUERTO>` |
 | Ver token de unión | `docker swarm join-token worker` o (`manager`) para recuperar el código necesario para nuevos nodos|
-| Abandonar el clúster | `docker swarm leave`|
+| Unirse al clúster | `docker swarm join --token <TOKEN> <IP_MANAGER>:<PUERTO>` según el token se añade un worker o un manager |
+| Promover un worker a manager | `docker swarm leave`|
+| Abandonar el clúster | `docker node promote <HOSTNAME_WORKER>` |
+
+Para que un cluster de Docker Swarm funcione correctamente entre nodos manager y worker, debes abrir 3 puertos principales entre todos los nodos del cluster.
+
+| Puerto   | Protocolo | Uso                                   |
+| -------- | --------- | ------------------------------------- |
+| **2377** | TCP       | Gestión del cluster (manager ↔ nodos) |
+| **7946** | TCP/UDP   | Comunicación entre nodos              |
+| **4789** | UDP       | Red overlay (VXLAN para contenedores) |
+
+```
+nc -zv <IP_MANAGER> 2377
+nc -zv <IP_MANAGER> 7946
+nc -zvu <IP_MANAGER> 7946
+nc -zvu <IP_MANAGER> 4789
+```
+
+Probar comunicación:
+
+```
+docker exec -it CONTAINER_ID sh
+ping IP_OTRO_CONTENEDOR 
+```
+
+
 
 ## Gestión de Nodos
 
