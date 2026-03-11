@@ -1,4 +1,4 @@
-# docker-swarm
+# Docker Swarm
 Comandos útiles para Docker Swarm
 
 
