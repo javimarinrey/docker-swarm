@@ -1,11 +1,10 @@
 # Docker Swarm
 Comandos útiles para Docker Swarm
 
+`docker info` muestra información general del Docker host y del Swarm (Si está activado).
 
-El comando principal para inicializar un clúster es:
-```
-docker swarm init
-```
+`docker swarm init` inicializa un clúster. 
+
 Este comando convierte el nodo actual en un manager y genera un token que permite a otros nodos unirse al grupo.
 
 ## Gestión del Clúster (Swarm)
